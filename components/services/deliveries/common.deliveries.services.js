@@ -72,7 +72,7 @@ const findWithFilters = async (req) => {
   let limit = req.body.limit ? (req.body.limit > 100 ? 100 : parseInt(req.body.limit)) : 100;
   let skip = page ? ((Math.max(0, parseInt(page)) - 1) * limit) : 0;
   let sort = { _id: 1 }
-
+  
   let deliveries = await Deliveries.aggregate([
     { $match: { when: { $gte: new Date(dateFrom), $lt: new Date(dateTo) } } },
 
@@ -92,7 +92,6 @@ const findWithFilters = async (req) => {
       }
 
     },
-
     {
       $facet: {
         paginatedResults: [{ $skip: skip }, { $limit: limit }],
@@ -105,11 +104,10 @@ const findWithFilters = async (req) => {
     },
 
     { $sort: sort },
-
   ])
 
   return {
-    totalResults: deliveries[0].totalResults,
+    totalResults: deliveries[0].totalResults[0].count,
     deliveries: deliveries[0].paginatedResults,
 
   }
